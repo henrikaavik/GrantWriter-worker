@@ -1,5 +1,5 @@
 # GrantWriter Worker - Background processing service
-# Includes heavy ML dependencies for document processing
+# Lightweight version without heavy ML dependencies
 
 # Core
 supabase>=2.0.0
@@ -9,6 +9,3 @@ openpyxl>=3.1.0
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 PyPDF2>=3.0.0
-
-# Document parsing - brings torch, transformers (~2GB install)
-docling>=2.0.0
