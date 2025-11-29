@@ -1,6 +1,5 @@
-"""Utility helper functions."""
+"""Utility helper functions (worker version - no streamlit)."""
 
-import streamlit as st
 from typing import Optional, Union
 from datetime import datetime
 
@@ -32,11 +31,3 @@ def get_file_extension(filename: str) -> str:
     if "." in filename:
         return filename.rsplit(".", 1)[-1].lower()
     return ""
-
-
-def show_help(help_key: str):
-    """Display help tooltip using translation key."""
-    from src.i18n.translations import t
-    help_text = t(f"help.{help_key}")
-    if help_text != f"help.{help_key}":
-        st.caption(f"? {help_text}")

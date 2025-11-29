@@ -1,15 +1,18 @@
-"""Internationalization (i18n) utilities."""
+"""Internationalization (i18n) utilities (worker version - no streamlit)."""
 
-import streamlit as st
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
+from functools import lru_cache
 
 # Path to locale files
 LOCALES_PATH = Path(__file__).parent / "locales"
 
+# Module-level language setting (default Estonian)
+_current_language = "et"
 
-@st.cache_data(ttl=60)  # Cache for 60 seconds to pick up translation changes
+
+@lru_cache(maxsize=2)
 def load_translations(language: str) -> dict:
     """
     Load translations for a language.
@@ -32,14 +35,12 @@ def load_translations(language: str) -> dict:
 
 def get_language() -> str:
     """
-    Get current language from session state.
+    Get current language.
 
     Returns:
         Language code ('et' or 'en')
     """
-    if "language" not in st.session_state:
-        st.session_state.language = "et"
-    return st.session_state.language
+    return _current_language
 
 
 def set_language(language: str):
@@ -49,8 +50,9 @@ def set_language(language: str):
     Args:
         language: Language code ('et' or 'en')
     """
+    global _current_language
     if language in ["et", "en"]:
-        st.session_state.language = language
+        _current_language = language
 
 
 def t(key: str, **kwargs) -> str:
@@ -90,7 +92,7 @@ def t(key: str, **kwargs) -> str:
     return value
 
 
-def get_localized_field(data: dict, field: str) -> str:
+def get_localized_field(data: dict, field: str, language: str = None) -> str:
     """
     Get localized field from a database record.
     Falls back to base field if localized version not available.
@@ -98,13 +100,14 @@ def get_localized_field(data: dict, field: str) -> str:
     Args:
         data: Database record dict
         field: Base field name (e.g., 'name', 'description')
+        language: Optional language override
 
     Returns:
         Localized value or base value
     """
-    language = get_language()
+    lang = language or get_language()
 
-    if language == "en":
+    if lang == "en":
         localized_key = f"{field}_en"
         if localized_key in data and data[localized_key]:
             return data[localized_key]

@@ -1,29 +1,28 @@
-"""Supabase database connection utilities."""
+"""Supabase database connection utilities (worker version - no streamlit)."""
 
-import streamlit as st
 from supabase import create_client, Client
 from typing import Optional
 from ..utils.secrets import get_supabase_url, get_supabase_key
+
+# Module-level client cache
+_db_client: Optional[Client] = None
 
 
 def get_db() -> Client:
     """
     Get Supabase database client.
-    Uses authenticated client if available for proper RLS access.
 
     Returns:
         Supabase client instance
     """
-    # Prefer the authenticated client from auth module
-    if "supabase_client" in st.session_state:
-        return st.session_state.supabase_client
+    global _db_client
 
-    # Fallback to creating a new client
-    if "db_client" not in st.session_state:
+    if _db_client is None:
         url = get_supabase_url()
         key = get_supabase_key()
-        st.session_state.db_client = create_client(url, key)
-    return st.session_state.db_client
+        _db_client = create_client(url, key)
+
+    return _db_client
 
 
 def execute_query(query, ttl: Optional[str] = None):

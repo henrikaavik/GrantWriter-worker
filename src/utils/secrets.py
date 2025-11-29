@@ -1,16 +1,13 @@
-"""Secrets management - supports both st.secrets and environment variables."""
+"""Secrets management - uses environment variables only (no streamlit)."""
 
 import os
-import streamlit as st
 
 
 def get_secret(key: str, subkey: str = None) -> str:
     """
-    Get a secret value from st.secrets or environment variables.
+    Get a secret value from environment variables.
 
-    Supports both formats:
-    - st.secrets["supabase"]["url"] -> get_secret("supabase", "url")
-    - os.environ["SUPABASE_URL"] -> get_secret("supabase", "url")
+    Converts format: supabase.url -> SUPABASE_URL
 
     Args:
         key: Top-level key (e.g., "supabase", "google")
@@ -22,16 +19,6 @@ def get_secret(key: str, subkey: str = None) -> str:
     Raises:
         KeyError: If secret not found
     """
-    # Try st.secrets first
-    try:
-        if subkey:
-            return st.secrets[key][subkey]
-        return st.secrets[key]
-    except Exception:
-        # Catches KeyError, FileNotFoundError, and any other secrets-related errors
-        pass
-
-    # Fall back to environment variables
     # Convert to uppercase ENV var format: supabase.url -> SUPABASE_URL
     if subkey:
         env_key = f"{key.upper()}_{subkey.upper()}"

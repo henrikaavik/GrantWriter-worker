@@ -1,24 +1,17 @@
-"""Supabase storage operations."""
+"""Supabase storage operations (worker version - no streamlit)."""
 
-import streamlit as st
-from supabase import create_client, Client
-from typing import Tuple, Optional
+from supabase import Client
+from typing import Optional
 import uuid
 import re
 import unicodedata
 
+from ..database.connection import get_db
+
 
 def get_storage_client() -> Client:
-    """Get Supabase client for storage operations - uses authenticated client if available."""
-    # Use the authenticated client from auth module if it exists
-    if "supabase_client" in st.session_state:
-        return st.session_state.supabase_client
-    # Fallback to creating a new client
-    if "storage_client" not in st.session_state:
-        url = st.secrets["supabase"]["url"]
-        key = st.secrets["supabase"]["key"]
-        st.session_state.storage_client = create_client(url, key)
-    return st.session_state.storage_client
+    """Get Supabase client for storage operations."""
+    return get_db()
 
 
 def upload_file(
