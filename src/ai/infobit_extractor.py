@@ -50,37 +50,33 @@ def extract_infobits_from_document(
     client = get_gemini_client()
     model = "gemini-2.0-flash"
 
-    lang_instruction = (
-        "The document is likely in Estonian. Extract values in their original language."
-        if language == "et"
-        else "Extract values in their original language from the document."
-    )
-
     prompt = f"""
-    {lang_instruction}
+    TÄHTIS: Kogu väljund PEAB olema eesti keeles.
+    Kui dokument on inglise keeles või muus keeles, tõlgi eraldatud väärtused eesti keelde.
 
-    You are an expert at extracting structured information from documents.
-    Analyze the following document and extract values that match the specified fields.
+    Sa oled ekspert struktureeritud info eraldamisel dokumentidest.
+    Analüüsi järgmist dokumenti ja eralda väärtused, mis vastavad määratud väljadele.
 
-    For each field you can find relevant information for:
-    1. Extract the exact value from the document
-    2. Provide a confidence score (0.0-1.0) based on how certain you are
-    3. Include the source text snippet (max 100 chars)
+    Iga välja kohta, mille kohta leiad infot:
+    1. Eralda väärtus dokumendist (EESTI KEELES, tõlgi vajadusel)
+    2. Anna usaldusväärsuse hinne (0.0-1.0)
+    3. Lisa lähteteksti väljavõte (max 100 tähemärki)
 
-    Only extract values you are confident about. Don't guess or make up information.
-    If you cannot find information for a field, skip it entirely.
+    Eralda ainult väärtusi, milles oled kindel. Ära arva ega mõtle välja.
+    Kui ei leia välja kohta infot, jäta see vahele.
 
-    FIELDS TO EXTRACT:
+    VÄLJAD, MIDA ERALDADA:
     ---
     {fields_description}
     ---
 
-    DOCUMENT CONTENT:
+    DOKUMENDI SISU:
     ---
     {document_text[:15000]}
     ---
 
-    Extract matching values from the document for as many fields as possible.
+    Eralda dokumentidest sobivad väärtused nii paljude väljade jaoks kui võimalik.
+    KÕIK ERALDATUD VÄÄRTUSED PEAVAD OLEMA EESTI KEELES.
     """
 
     try:

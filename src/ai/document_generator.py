@@ -285,3 +285,100 @@ class DocumentGenerator:
         buffer.seek(0)
 
         return buffer.getvalue()
+
+    def generate_docx_from_sections(
+        self,
+        project_name: str,
+        grant_name: str,
+        sections: list
+    ) -> Optional[bytes]:
+        """
+        Generate final DOCX from pre-edited sections.
+
+        Args:
+            project_name: Name of the project
+            grant_name: Name of the grant
+            sections: List of section dicts with 'section_name' and 'content'
+
+        Returns:
+            DOCX file as bytes or None on error
+        """
+        try:
+            doc = Document()
+
+            # Title
+            title = doc.add_heading(project_name, 0)
+            title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Subtitle with grant name
+            subtitle = doc.add_paragraph()
+            subtitle_run = subtitle.add_run(
+                f"Taotlus: {grant_name}" if self.language == "et"
+                else f"Application for: {grant_name}"
+            )
+            subtitle_run.italic = True
+            subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            doc.add_paragraph()  # Spacing
+
+            # Add each section
+            for section in sections:
+                section_name = section.get("section_name", "")
+                content = section.get("content", "")
+
+                if not section_name:
+                    continue
+
+                # Add section heading
+                doc.add_heading(section_name, level=1)
+
+                if content:
+                    # Split content into paragraphs and process
+                    for para in content.split("\n\n"):
+                        para = para.strip()
+                        if not para:
+                            continue
+
+                        # Check if it's a subheading (starts with ## or **)
+                        if para.startswith("##"):
+                            heading_text = para.lstrip("#").strip()
+                            doc.add_heading(heading_text, level=2)
+                        elif para.startswith("**") and para.endswith("**"):
+                            heading_text = para.strip("*").strip()
+                            doc.add_heading(heading_text, level=2)
+                        elif para.startswith("- ") or para.startswith("* "):
+                            # Handle bullet points
+                            lines = para.split("\n")
+                            for line in lines:
+                                line = line.strip()
+                                if line.startswith("- ") or line.startswith("* "):
+                                    bullet_text = line[2:].strip()
+                                    doc.add_paragraph(bullet_text, style="List Bullet")
+                                elif line:
+                                    doc.add_paragraph(line)
+                        else:
+                            # Regular paragraph - handle single newlines as line breaks
+                            paragraph = doc.add_paragraph()
+                            lines = para.split("\n")
+                            for i, line in enumerate(lines):
+                                if i > 0:
+                                    paragraph.add_run("\n")
+                                paragraph.add_run(line.strip())
+                else:
+                    # Empty section placeholder
+                    empty_para = doc.add_paragraph()
+                    empty_run = empty_para.add_run(
+                        "[Sisu puudub]" if self.language == "et"
+                        else "[No content]"
+                    )
+                    empty_run.italic = True
+
+            # Save to bytes
+            buffer = io.BytesIO()
+            doc.save(buffer)
+            buffer.seek(0)
+
+            return buffer.getvalue()
+        except Exception as e:
+            print(f"Error generating DOCX from sections: {e}")
+            return None

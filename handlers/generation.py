@@ -14,11 +14,16 @@ def handle_generation(
     """
     Generate application documents (DOCX and/or XLSX).
 
-    task_data format:
+    task_data format (legacy):
     {
         "language": "et",
         "generate_docx": true,
         "generate_xlsx": true
+    }
+
+    task_data format (new):
+    {
+        "output_type": "application_docx_from_sections" | "budget_xlsx"
     }
 
     Returns:
@@ -30,8 +35,17 @@ def handle_generation(
     from src.database.documents import create_project_result
 
     language = task_data.get("language", "et")
-    generate_docx = task_data.get("generate_docx", True)
-    generate_xlsx = task_data.get("generate_xlsx", False)
+
+    # Support both new output_type format and legacy format
+    output_type = task_data.get("output_type")
+    if output_type:
+        generate_docx = output_type == "application_docx"
+        generate_xlsx = output_type == "budget_xlsx"
+        generate_from_sections = output_type == "application_docx_from_sections"
+    else:
+        generate_docx = task_data.get("generate_docx", True)
+        generate_xlsx = task_data.get("generate_xlsx", False)
+        generate_from_sections = False
 
     progress_callback(0, "Loading project data...")
 
@@ -51,7 +65,47 @@ def handle_generation(
     generator = DocumentGenerator(language=language)
     result = {}
 
-    if generate_docx:
+    # Generate from pre-edited sections
+    if generate_from_sections:
+        from src.database.sections import get_project_sections
+
+        progress_callback(20, "Loading sections...")
+        sections = get_project_sections(project_id)
+
+        if not sections:
+            raise Exception("No sections found for this project")
+
+        progress_callback(40, "Generating application document from sections...")
+
+        docx_bytes = generator.generate_docx_from_sections(
+            project_name=project.get("name", "Application"),
+            grant_name=grant.get("name", ""),
+            sections=sections
+        )
+
+        if docx_bytes:
+            progress_callback(60, "Saving DOCX...")
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"application_{timestamp}.docx"
+
+            file_path = upload_project_doc(
+                user_id,
+                project_id,
+                docx_bytes,
+                filename,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+            if file_path:
+                create_project_result(
+                    project_id=project_id,
+                    result_type="application_docx_from_sections",
+                    file_path=file_path
+                )
+                result["docx_path"] = file_path
+
+    # Generate traditional DOCX (AI-generated content)
+    elif generate_docx:
         progress_callback(20, "Generating application document...")
 
         docx_bytes = generator.generate_application_docx(
