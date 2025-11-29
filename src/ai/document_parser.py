@@ -38,6 +38,14 @@ class DocumentParser:
         # Get file extension
         suffix = os.path.splitext(filename)[1].lower()
 
+        # For PDFs, try lightweight extraction first to save memory
+        if suffix == ".pdf":
+            text = self._try_pypdf2(file_bytes)
+            if text and len(text.strip()) > 100:  # Got meaningful text
+                print(f"Using PyPDF2 (fast) for {filename}")
+                return {"text": text, "markdown": text, "metadata": {"method": "pypdf2"}}
+            print(f"PyPDF2 insufficient, trying docling/OCR for {filename}")
+
         # Write to temp file (Docling needs file path)
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(file_bytes)
@@ -89,6 +97,21 @@ class DocumentParser:
                 os.unlink(tmp_path)
             except Exception:
                 pass
+
+    def _try_pypdf2(self, file_bytes: bytes) -> str:
+        """Try lightweight PDF extraction with PyPDF2."""
+        try:
+            import io
+            from PyPDF2 import PdfReader
+            reader = PdfReader(io.BytesIO(file_bytes))
+            text = "\n".join(
+                page.extract_text() or ""
+                for page in reader.pages
+            )
+            return text
+        except Exception as e:
+            print(f"PyPDF2 extraction failed: {e}")
+            return ""
 
     def _fallback_extract(
         self,

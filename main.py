@@ -124,9 +124,9 @@ def process_task(db, task: dict):
 def recover_stale_tasks(db):
     """Reset tasks stuck in 'processing' status (from crashed workers)."""
     try:
-        # Find tasks stuck in processing for more than 5 minutes
-        from datetime import timedelta
-        cutoff = (datetime.utcnow() - timedelta(minutes=5)).isoformat()
+        # Find tasks stuck in processing for more than 2 minutes
+        from datetime import timedelta, timezone
+        cutoff = (datetime.now(timezone.utc) - timedelta(minutes=2)).isoformat()
 
         result = db.table("task_queue").select("id, task_type, started_at").eq(
             "status", "processing"

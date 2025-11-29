@@ -1,5 +1,6 @@
 """Handler for infobit extraction tasks."""
 
+import gc
 from typing import Dict, Any, Callable
 
 
@@ -77,6 +78,10 @@ def handle_infobit_extraction(
                             if ib["id"] != infobit["id"]
                         ]
                         break
+
+        # Free memory between files to prevent OOM on Render free tier
+        del file_data
+        gc.collect()
 
     # Update project completion
     progress_callback(95, "Updating completion...")
