@@ -121,6 +121,32 @@ def process_task(db, task: dict):
         fail_task(db, task_id, str(e))
 
 
+def recover_stale_tasks(db):
+    """Reset tasks stuck in 'processing' status (from crashed workers)."""
+    try:
+        # Find tasks stuck in processing for more than 5 minutes
+        from datetime import timedelta
+        cutoff = (datetime.utcnow() - timedelta(minutes=5)).isoformat()
+
+        result = db.table("task_queue").select("id, task_type, started_at").eq(
+            "status", "processing"
+        ).lt("started_at", cutoff).execute()
+
+        stale_tasks = result.data or []
+        if stale_tasks:
+            print(f"🔄 Found {len(stale_tasks)} stale tasks to recover", flush=True)
+            for task in stale_tasks:
+                db.table("task_queue").update({
+                    "status": "pending",
+                    "progress": 0,
+                    "progress_message": "Requeued after worker restart",
+                    "worker_id": None
+                }).eq("id", task["id"]).execute()
+                print(f"  ↩️ Reset task {task['id']} ({task['task_type']})", flush=True)
+    except Exception as e:
+        print(f"⚠️ Error recovering stale tasks: {e}", flush=True)
+
+
 def main():
     """Main worker loop."""
     print(f"🚀 Worker {WORKER_ID} starting...", flush=True)
@@ -142,6 +168,9 @@ def main():
     except Exception as e:
         print(f"❌ Failed to connect to Supabase: {e}", flush=True)
         sys.exit(1)
+
+    # Recover any stuck tasks from previous worker crashes
+    recover_stale_tasks(db)
 
     print("👀 Polling for tasks...", flush=True)
 
