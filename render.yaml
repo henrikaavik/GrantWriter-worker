@@ -2,7 +2,7 @@ services:
   - type: worker
     name: grantwriter-worker
     runtime: python
-    plan: standard  # 2GB RAM required for docling/torch
+    plan: starter  # 512MB sufficient after removing docling/torch
     buildCommand: pip install -r requirements.txt
     startCommand: python main.py
     envVars:
