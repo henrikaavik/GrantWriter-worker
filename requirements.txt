@@ -1,0 +1,13 @@
+# GrantWriter Worker - Background processing service
+# Includes heavy ML dependencies for document processing
+
+# Core
+supabase>=2.0.0
+google-genai>=0.3.0
+python-docx>=1.1.0
+openpyxl>=3.1.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+
+# Document parsing - brings torch, transformers (~2GB install)
+docling>=2.0.0

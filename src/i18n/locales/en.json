@@ -1,0 +1,248 @@
+{
+    "app_title": "GrantWriter - Grant Application Assistant",
+    "version": "Version",
+
+    "nav": {
+        "home": "Home",
+        "grants": "Grants",
+        "projects": "Projects",
+        "requirements": "Requirements",
+        "upload": "Upload",
+        "review": "Review",
+        "results": "Results",
+        "admin": "Admin"
+    },
+
+    "auth": {
+        "login": "Log in",
+        "logout": "Log out",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "password_confirm": "Confirm password",
+        "full_name": "Full name",
+        "login_success": "Login successful!",
+        "login_error": "Login failed",
+        "register_success": "Registration successful! Please verify your email.",
+        "register_error": "Registration failed",
+        "password_mismatch": "Passwords do not match",
+        "login_required": "Please log in to continue",
+        "admin_required": "Admin access required",
+        "go_to_home": "Go to home page to log in"
+    },
+
+    "welcome": "Welcome",
+    "welcome_message": "GrantWriter helps you prepare application documents for Estonian grants.",
+
+    "grants": {
+        "title": "Available Grants",
+        "description": "Select a grant you want to apply for",
+        "select": "Select",
+        "view_on_eis": "View on EIS website",
+        "no_grants": "No grants available",
+        "create": "Create new grant",
+        "name_et": "Name (Estonian)",
+        "name_en": "Name (English)",
+        "description_et": "Description (Estonian)",
+        "description_en": "Description (English)",
+        "eis_link": "EIS website link",
+        "created": "Grant created!",
+        "active": "Active"
+    },
+
+    "projects": {
+        "title": "My Projects",
+        "your_projects": "Your projects",
+        "create": "Create new project",
+        "select_grant": "Select grant",
+        "name": "Project name",
+        "description": "Project description",
+        "created": "Project created!",
+        "no_projects": "You don't have any projects yet",
+        "open": "Open",
+        "delete": "Delete",
+        "delete_confirm": "Are you sure you want to delete this project?",
+        "status": "Status",
+        "grant": "Grant",
+        "score": "Score"
+    },
+
+    "status": {
+        "draft": "Draft",
+        "in_progress": "In Progress",
+        "submitted": "Submitted",
+        "completed": "Completed"
+    },
+
+    "requirements": {
+        "title": "Grant Requirements",
+        "description": "Review the requirements you need to fulfill",
+        "checklist": "Checklist",
+        "no_requirements": "No requirements defined yet",
+        "download": "Download",
+        "mandatory": "Mandatory",
+        "optional": "Optional"
+    },
+
+    "upload": {
+        "title": "Upload Documents",
+        "select_project": "Please select a project first",
+        "go_to_projects": "Go to projects page",
+        "required_docs": "Required documents",
+        "your_docs": "Your uploaded documents",
+        "choose_files": "Choose files",
+        "processing": "Processing",
+        "uploaded": "Uploaded",
+        "no_docs": "No documents uploaded yet",
+        "back_to_requirements": "Back to requirements",
+        "proceed_to_review": "Proceed to review",
+        "failed": "Upload failed",
+        "all_failed": "All uploads failed"
+    },
+
+    "review": {
+        "title": "AI Review",
+        "run_evaluation": "Run AI Evaluation",
+        "evaluating": "Evaluating documents...",
+        "evaluation_complete": "Evaluation complete!",
+        "overall_score": "Overall Score",
+        "document_evaluations": "Document Evaluations",
+        "not_evaluated": "Not evaluated yet",
+        "summary": "Summary",
+        "strengths": "Strengths",
+        "weaknesses": "Areas for Improvement",
+        "recommendations": "Recommendations",
+        "annotations": "Annotations",
+        "back_to_upload": "Back to upload",
+        "generate_results": "Generate results"
+    },
+
+    "results": {
+        "title": "Generated Documents",
+        "complete_review": "Please complete the review first",
+        "go_to_review": "Go to review page",
+        "generate_docs": "Generate application documents",
+        "generate_docx": "Generate Application (DOCX)",
+        "generate_xlsx": "Generate Budget (XLSX)",
+        "generating": "Generating...",
+        "generated": "Document generated!",
+        "no_results": "No generated documents yet",
+        "download": "Download",
+        "generated_at": "Generated at",
+        "type_application_docx": "Application Document",
+        "type_budget_xlsx": "Budget Spreadsheet"
+    },
+
+    "admin": {
+        "title": "Admin Panel",
+        "users": "Users",
+        "grants_management": "Grants Management",
+        "all_projects": "All Projects",
+        "role": "Role",
+        "change_role": "Change role",
+        "save": "Save",
+        "upload_requirement": "Upload requirement document",
+        "requirement_name": "Requirement name",
+        "upload_and_process": "Upload and process",
+        "extracting": "Extracting requirements...",
+        "extracted": "Requirements extracted!",
+        "items_extracted": "requirements extracted",
+        "user": "User",
+        "extract_all": "Extract requirements",
+        "example_documents": "Example Documents",
+        "example_documents_help": "Upload example documents that AI will use as reference when generating final documents",
+        "upload_example": "Upload example files",
+        "project_sharing": "Project Sharing",
+        "shared_with": "Shared with",
+        "no_shares": "Not shared with anyone",
+        "add_user_access": "Add user access",
+        "select_user": "Select user",
+        "access_level": "Access level",
+        "share": "Share",
+        "revoke_access": "Revoke access",
+        "access_granted": "Access granted!",
+        "access_revoked": "Access revoked!",
+        "no_users_to_share": "No users available to share with"
+    },
+
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "back": "Back",
+        "next": "Next",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "name_required": "Name is required",
+        "continue": "Continue",
+        "try_again": "Try again"
+    },
+
+    "help": {
+        "grants": "Select the grant you want to apply for. Each grant has specific requirements described.",
+        "projects": "Here you can manage your projects. Each project is linked to one grant.",
+        "upload": "Upload all required documents. System supports PDF, DOCX and XLSX formats.",
+        "review": "AI will evaluate your documents and provide recommendations for improvement.",
+        "results": "Here you can generate final application documents and download them."
+    },
+
+    "infobits": {
+        "title": "Project Data",
+        "description": "Fill required fields manually or upload documents for AI extraction",
+        "completion": "Completed",
+        "generating": "Generating required fields...",
+        "generated": "Fields generated!",
+        "upload_extract": "Upload and Extract",
+        "manual_entry": "Manual Entry",
+        "extract_button": "Extract data",
+        "extracting": "Extracting data...",
+        "extracted": "Data extracted!",
+        "fields_filled": "fields filled",
+        "files_selected": "files selected",
+        "upload_help": "Upload company documents and AI will automatically extract data",
+        "upload_instructions": "Select documents to extract data from",
+        "manual_help": "Enter data manually or view AI-filled fields",
+        "source_manual": "Manual entry",
+        "source_ai": "AI extracted",
+        "confidence": "Confidence",
+        "required": "Required",
+        "optional": "Optional",
+        "no_value": "No value",
+        "category_general": "General Info",
+        "category_company": "Company Details",
+        "category_project": "Project Info",
+        "category_budget": "Budget",
+        "category_team": "Team",
+        "category_timeline": "Timeline",
+        "category_outcomes": "Outcomes",
+        "uploading": "Uploading...",
+        "uploaded_docs": "Uploaded Documents"
+    },
+
+    "tasks": {
+        "pending": "Pending",
+        "waiting": "Waiting for processing",
+        "processing": "Processing",
+        "can_navigate": "You can navigate to other pages. Processing continues in the background.",
+        "submitted": "Task submitted!",
+        "submit_failed": "Failed to submit task",
+        "failed": "Task failed",
+        "cancel": "Cancel",
+        "active_task": "Processing...",
+        "pending_task": "Task waiting..."
+    },
+
+    "project": {
+        "tab_info": "Info",
+        "tab_documents": "Documents",
+        "tab_review": "Review",
+        "tab_results": "Results",
+        "tab_tasks": "Tasks",
+        "failed_tasks_alert": "task(s) failed!",
+        "view_details": "View details",
+        "retry": "Retry"
+    }
+}
