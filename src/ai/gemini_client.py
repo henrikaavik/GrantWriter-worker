@@ -265,6 +265,116 @@ class GeminiService:
 
             Provide a reasonable budget breakdown with estimated amounts and justifications.
             Format as a table with columns: Category, Description, Amount (EUR), Justification
+            """,
+
+            "cover_letter": f"""
+            {self._get_language_instruction()}
+
+            Write a formal cover letter for a grant application.
+            The letter should:
+            - Be addressed appropriately (Dear Sir/Madam or equivalent)
+            - Introduce the applicant and the project
+            - Briefly explain why this grant is being sought
+            - Highlight key strengths and relevance
+            - Be professional, concise (1 page max)
+            - Include a formal closing
+
+            PROJECT: {project_info.get('name', '')}
+            GRANT: {project_info.get('grant_name', '')}
+            DESCRIPTION: {project_info.get('description', '')}
+
+            GRANT REQUIREMENTS:
+            {requirements_text[:2000]}
+
+            SOURCE DOCUMENTS:
+            {docs_summary[:3000]}
+
+            Write a professional cover letter.
+            """,
+
+            "executive_summary": f"""
+            {self._get_language_instruction()}
+
+            Write a comprehensive executive summary for this grant application.
+            The summary should be ONE PAGE maximum and include:
+            - Project title and applicant
+            - Problem statement / need being addressed
+            - Proposed solution and approach
+            - Key objectives and expected outcomes
+            - Budget summary (total amount requested)
+            - Timeline overview
+            - Why this project deserves funding
+
+            PROJECT: {project_info.get('name', '')}
+            DESCRIPTION: {project_info.get('description', '')}
+
+            GRANT REQUIREMENTS:
+            {requirements_text[:2000]}
+
+            SOURCE DOCUMENTS:
+            {docs_summary[:5000]}
+
+            Write a compelling executive summary that captures the essence of the project.
+            """,
+
+            "timeline": f"""
+            {self._get_language_instruction()}
+
+            Create a project timeline/schedule for this grant application.
+            Structure it as a table with:
+            - Phase/Milestone name
+            - Key activities
+            - Start date (Month 1, Month 2, etc.)
+            - End date
+            - Deliverables
+
+            Include typical project phases:
+            - Project initiation
+            - Research/Development phases
+            - Testing/Validation
+            - Implementation
+            - Reporting and closeout
+
+            PROJECT: {project_info.get('name', '')}
+            DESCRIPTION: {project_info.get('description', '')}
+
+            GRANT REQUIREMENTS (may include timeline requirements):
+            {requirements_text[:2000]}
+
+            SOURCE DOCUMENTS:
+            {docs_summary[:3000]}
+
+            Create a realistic timeline.
+            Format as: Phase | Activities | Start | End | Deliverables
+            """,
+
+            "risk_analysis": f"""
+            {self._get_language_instruction()}
+
+            Write a comprehensive risk analysis for this grant application.
+            Include:
+            - Technical risks (technology, implementation challenges)
+            - Operational risks (team, resources, timeline)
+            - Financial risks (cost overruns, funding gaps)
+            - External risks (market, regulatory, dependencies)
+
+            For EACH risk provide:
+            1. Risk description
+            2. Likelihood (High/Medium/Low)
+            3. Impact (High/Medium/Low)
+            4. Mitigation strategy
+
+            PROJECT: {project_info.get('name', '')}
+            DESCRIPTION: {project_info.get('description', '')}
+
+            GRANT REQUIREMENTS:
+            {requirements_text[:2000]}
+
+            SOURCE DOCUMENTS:
+            {docs_summary[:3000]}
+
+            Provide a thorough risk analysis with mitigation strategies.
+            Format each risk clearly with all four components.
             """
         }
 

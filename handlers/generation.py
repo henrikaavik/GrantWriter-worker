@@ -42,10 +42,18 @@ def handle_generation(
         generate_docx = output_type == "application_docx"
         generate_xlsx = output_type == "budget_xlsx"
         generate_from_sections = output_type == "application_docx_from_sections"
+        generate_cover_letter = output_type == "cover_letter_docx"
+        generate_executive_summary = output_type == "executive_summary_docx"
+        generate_timeline = output_type == "timeline_xlsx"
+        generate_risk_analysis = output_type == "risk_analysis_docx"
     else:
         generate_docx = task_data.get("generate_docx", True)
         generate_xlsx = task_data.get("generate_xlsx", False)
         generate_from_sections = False
+        generate_cover_letter = False
+        generate_executive_summary = False
+        generate_timeline = False
+        generate_risk_analysis = False
 
     progress_callback(0, "Loading project data...")
 
@@ -162,6 +170,126 @@ def handle_generation(
                     file_path=file_path
                 )
                 result["xlsx_path"] = file_path
+
+    # Generate cover letter
+    if generate_cover_letter:
+        progress_callback(20, "Generating cover letter...")
+
+        docx_bytes = generator.generate_cover_letter_docx(
+            project=project,
+            requirements_text=requirements_text
+        )
+
+        if docx_bytes:
+            progress_callback(60, "Saving cover letter...")
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"cover_letter_{timestamp}.docx"
+
+            file_path = upload_project_doc(
+                user_id,
+                project_id,
+                docx_bytes,
+                filename,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+            if file_path:
+                create_project_result(
+                    project_id=project_id,
+                    result_type="cover_letter_docx",
+                    file_path=file_path
+                )
+                result["cover_letter_path"] = file_path
+
+    # Generate executive summary
+    if generate_executive_summary:
+        progress_callback(20, "Generating executive summary...")
+
+        docx_bytes = generator.generate_executive_summary_docx(
+            project=project,
+            requirements_text=requirements_text
+        )
+
+        if docx_bytes:
+            progress_callback(60, "Saving executive summary...")
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"executive_summary_{timestamp}.docx"
+
+            file_path = upload_project_doc(
+                user_id,
+                project_id,
+                docx_bytes,
+                filename,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+            if file_path:
+                create_project_result(
+                    project_id=project_id,
+                    result_type="executive_summary_docx",
+                    file_path=file_path
+                )
+                result["executive_summary_path"] = file_path
+
+    # Generate timeline
+    if generate_timeline:
+        progress_callback(20, "Generating timeline...")
+
+        xlsx_bytes = generator.generate_timeline_xlsx(
+            project=project,
+            requirements_text=requirements_text
+        )
+
+        if xlsx_bytes:
+            progress_callback(60, "Saving timeline...")
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"timeline_{timestamp}.xlsx"
+
+            file_path = upload_project_doc(
+                user_id,
+                project_id,
+                xlsx_bytes,
+                filename,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
+            if file_path:
+                create_project_result(
+                    project_id=project_id,
+                    result_type="timeline_xlsx",
+                    file_path=file_path
+                )
+                result["timeline_path"] = file_path
+
+    # Generate risk analysis
+    if generate_risk_analysis:
+        progress_callback(20, "Generating risk analysis...")
+
+        docx_bytes = generator.generate_risk_analysis_docx(
+            project=project,
+            requirements_text=requirements_text
+        )
+
+        if docx_bytes:
+            progress_callback(60, "Saving risk analysis...")
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"risk_analysis_{timestamp}.docx"
+
+            file_path = upload_project_doc(
+                user_id,
+                project_id,
+                docx_bytes,
+                filename,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+            if file_path:
+                create_project_result(
+                    project_id=project_id,
+                    result_type="risk_analysis_docx",
+                    file_path=file_path
+                )
+                result["risk_analysis_path"] = file_path
 
     # Update project status
     if result:

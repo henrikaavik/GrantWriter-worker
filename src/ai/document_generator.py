@@ -382,3 +382,392 @@ class DocumentGenerator:
         except Exception as e:
             print(f"Error generating DOCX from sections: {e}")
             return None
+
+    def generate_cover_letter_docx(
+        self,
+        project: dict,
+        requirements_text: str
+    ) -> Optional[bytes]:
+        """
+        Generate a formal cover letter DOCX.
+
+        Args:
+            project: Project data with documents
+            requirements_text: Grant requirements text
+
+        Returns:
+            DOCX file as bytes or None on error
+        """
+        try:
+            # Compile document texts
+            doc_texts = {}
+            for doc in project.get("project_documents", []):
+                if doc.get("extracted_text"):
+                    doc_texts[doc["name"]] = doc["extracted_text"]
+
+            project_info = {
+                "name": project.get("name", ""),
+                "description": project.get("description", ""),
+                "grant_name": project.get("grants", {}).get("name", "")
+            }
+
+            # Generate cover letter content using AI
+            content = self.gemini.generate_content(
+                project_info=project_info,
+                documents_text=doc_texts,
+                requirements_text=requirements_text,
+                content_type="cover_letter"
+            )
+
+            if not content:
+                return None
+
+            # Create DOCX document
+            doc = Document()
+
+            # Title
+            title = doc.add_heading(
+                "Kaaskiri" if self.language == "et" else "Cover Letter",
+                0
+            )
+            title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            doc.add_paragraph()  # Spacing
+
+            # Add the cover letter content
+            for para in content.split("\n\n"):
+                if para.strip():
+                    doc.add_paragraph(para.strip())
+
+            # Save to bytes
+            buffer = io.BytesIO()
+            doc.save(buffer)
+            buffer.seek(0)
+
+            return buffer.getvalue()
+        except Exception as e:
+            print(f"Error generating cover letter: {e}")
+            return None
+
+    def generate_executive_summary_docx(
+        self,
+        project: dict,
+        requirements_text: str
+    ) -> Optional[bytes]:
+        """
+        Generate an executive summary DOCX.
+
+        Args:
+            project: Project data with documents
+            requirements_text: Grant requirements text
+
+        Returns:
+            DOCX file as bytes or None on error
+        """
+        try:
+            # Compile document texts
+            doc_texts = {}
+            for doc in project.get("project_documents", []):
+                if doc.get("extracted_text"):
+                    doc_texts[doc["name"]] = doc["extracted_text"]
+
+            project_info = {
+                "name": project.get("name", ""),
+                "description": project.get("description", ""),
+                "grant_name": project.get("grants", {}).get("name", "")
+            }
+
+            # Generate executive summary content using AI
+            content = self.gemini.generate_content(
+                project_info=project_info,
+                documents_text=doc_texts,
+                requirements_text=requirements_text,
+                content_type="executive_summary"
+            )
+
+            if not content:
+                return None
+
+            # Create DOCX document
+            doc = Document()
+
+            # Title
+            title = doc.add_heading(
+                "Kokkuvõte" if self.language == "et" else "Executive Summary",
+                0
+            )
+            title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Subtitle with project name
+            subtitle = doc.add_paragraph()
+            subtitle_run = subtitle.add_run(project_info["name"])
+            subtitle_run.italic = True
+            subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            doc.add_paragraph()  # Spacing
+
+            # Add the summary content with heading support
+            for para in content.split("\n\n"):
+                para = para.strip()
+                if not para:
+                    continue
+
+                # Check if it's a heading
+                if para.startswith("##"):
+                    heading_text = para.lstrip("#").strip()
+                    doc.add_heading(heading_text, level=2)
+                elif para.startswith("#"):
+                    heading_text = para.lstrip("#").strip()
+                    doc.add_heading(heading_text, level=1)
+                elif para.startswith("**") and para.endswith("**"):
+                    heading_text = para.strip("*").strip()
+                    doc.add_heading(heading_text, level=2)
+                else:
+                    doc.add_paragraph(para)
+
+            # Save to bytes
+            buffer = io.BytesIO()
+            doc.save(buffer)
+            buffer.seek(0)
+
+            return buffer.getvalue()
+        except Exception as e:
+            print(f"Error generating executive summary: {e}")
+            return None
+
+    def generate_timeline_xlsx(
+        self,
+        project: dict,
+        requirements_text: str
+    ) -> Optional[bytes]:
+        """
+        Generate a project timeline XLSX.
+
+        Args:
+            project: Project data with documents
+            requirements_text: Grant requirements text
+
+        Returns:
+            XLSX file as bytes or None on error
+        """
+        try:
+            # Compile document texts
+            doc_texts = {}
+            for doc in project.get("project_documents", []):
+                if doc.get("extracted_text"):
+                    doc_texts[doc["name"]] = doc["extracted_text"]
+
+            project_info = {
+                "name": project.get("name", ""),
+                "description": project.get("description", "")
+            }
+
+            # Generate timeline content using AI
+            timeline_content = self.gemini.generate_content(
+                project_info=project_info,
+                documents_text=doc_texts,
+                requirements_text=requirements_text,
+                content_type="timeline"
+            )
+
+            # Create XLSX workbook
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Ajakava" if self.language == "et" else "Timeline"
+
+            # Styles
+            header_font = Font(bold=True, size=12)
+            header_alignment = Alignment(horizontal="center", vertical="center")
+            thin_border = Border(
+                left=Side(style="thin"),
+                right=Side(style="thin"),
+                top=Side(style="thin"),
+                bottom=Side(style="thin")
+            )
+
+            # Title
+            ws.merge_cells("A1:E1")
+            ws["A1"] = f"{'Ajakava' if self.language == 'et' else 'Timeline'} - {project_info['name']}"
+            ws["A1"].font = Font(bold=True, size=14)
+            ws["A1"].alignment = Alignment(horizontal="center")
+
+            # Headers
+            headers = ["Phase", "Activities", "Start", "End", "Deliverables"]
+            if self.language == "et":
+                headers = ["Faas", "Tegevused", "Algus", "Lõpp", "Tulemid"]
+
+            for col, header in enumerate(headers, 1):
+                cell = ws.cell(row=3, column=col, value=header)
+                cell.font = header_font
+                cell.alignment = header_alignment
+                cell.border = thin_border
+
+            # Parse timeline content and add rows
+            row = 4
+
+            if timeline_content:
+                lines = timeline_content.split("\n")
+                for line in lines:
+                    line = line.strip()
+                    if not line or line.startswith("#") or line.startswith("---"):
+                        continue
+
+                    # Try to parse table row (pipe-separated)
+                    if "|" in line:
+                        parts = [p.strip() for p in line.split("|") if p.strip()]
+                        if len(parts) >= 3 and not all(c in "-|" for c in line):
+                            phase = parts[0] if len(parts) > 0 else ""
+                            activities = parts[1] if len(parts) > 1 else ""
+                            start = parts[2] if len(parts) > 2 else ""
+                            end = parts[3] if len(parts) > 3 else ""
+                            deliverables = parts[4] if len(parts) > 4 else ""
+
+                            # Skip header row
+                            if phase.lower() in ["phase", "faas"]:
+                                continue
+
+                            ws.cell(row=row, column=1, value=phase).border = thin_border
+                            ws.cell(row=row, column=2, value=activities).border = thin_border
+                            ws.cell(row=row, column=3, value=start).border = thin_border
+                            ws.cell(row=row, column=4, value=end).border = thin_border
+                            ws.cell(row=row, column=5, value=deliverables).border = thin_border
+                            row += 1
+
+            # If no structured content, add placeholder rows
+            if row == 4:
+                default_phases = [
+                    ("Initiation", "Project setup, team formation", "Month 1", "Month 1", "Project plan"),
+                    ("Development", "Core development work", "Month 2", "Month 6", "Prototype"),
+                    ("Testing", "Testing and validation", "Month 6", "Month 8", "Test results"),
+                    ("Implementation", "Deployment and rollout", "Month 8", "Month 10", "Deployed system"),
+                    ("Closeout", "Final reporting", "Month 10", "Month 12", "Final report")
+                ]
+                if self.language == "et":
+                    default_phases = [
+                        ("Alustamine", "Projekti seadistamine, meeskonna moodustamine", "Kuu 1", "Kuu 1", "Projektiplaan"),
+                        ("Arendus", "Põhiarendus", "Kuu 2", "Kuu 6", "Prototüüp"),
+                        ("Testimine", "Testimine ja valideerimine", "Kuu 6", "Kuu 8", "Testitulemused"),
+                        ("Rakendamine", "Juurutamine", "Kuu 8", "Kuu 10", "Juurutatud süsteem"),
+                        ("Lõpetamine", "Lõpparuandlus", "Kuu 10", "Kuu 12", "Lõpparuanne")
+                    ]
+
+                for phase, activities, start, end, deliverables in default_phases:
+                    ws.cell(row=row, column=1, value=phase).border = thin_border
+                    ws.cell(row=row, column=2, value=activities).border = thin_border
+                    ws.cell(row=row, column=3, value=start).border = thin_border
+                    ws.cell(row=row, column=4, value=end).border = thin_border
+                    ws.cell(row=row, column=5, value=deliverables).border = thin_border
+                    row += 1
+
+            # Adjust column widths
+            ws.column_dimensions["A"].width = 20
+            ws.column_dimensions["B"].width = 40
+            ws.column_dimensions["C"].width = 12
+            ws.column_dimensions["D"].width = 12
+            ws.column_dimensions["E"].width = 30
+
+            # Save to bytes
+            buffer = io.BytesIO()
+            wb.save(buffer)
+            buffer.seek(0)
+
+            return buffer.getvalue()
+        except Exception as e:
+            print(f"Error generating timeline: {e}")
+            return None
+
+    def generate_risk_analysis_docx(
+        self,
+        project: dict,
+        requirements_text: str
+    ) -> Optional[bytes]:
+        """
+        Generate a risk analysis DOCX.
+
+        Args:
+            project: Project data with documents
+            requirements_text: Grant requirements text
+
+        Returns:
+            DOCX file as bytes or None on error
+        """
+        try:
+            # Compile document texts
+            doc_texts = {}
+            for doc in project.get("project_documents", []):
+                if doc.get("extracted_text"):
+                    doc_texts[doc["name"]] = doc["extracted_text"]
+
+            project_info = {
+                "name": project.get("name", ""),
+                "description": project.get("description", ""),
+                "grant_name": project.get("grants", {}).get("name", "")
+            }
+
+            # Generate risk analysis content using AI
+            content = self.gemini.generate_content(
+                project_info=project_info,
+                documents_text=doc_texts,
+                requirements_text=requirements_text,
+                content_type="risk_analysis"
+            )
+
+            if not content:
+                return None
+
+            # Create DOCX document
+            doc = Document()
+
+            # Title
+            title = doc.add_heading(
+                "Riskianalüüs" if self.language == "et" else "Risk Analysis",
+                0
+            )
+            title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Subtitle with project name
+            subtitle = doc.add_paragraph()
+            subtitle_run = subtitle.add_run(project_info["name"])
+            subtitle_run.italic = True
+            subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            doc.add_paragraph()  # Spacing
+
+            # Add the risk analysis content with heading support
+            for para in content.split("\n\n"):
+                para = para.strip()
+                if not para:
+                    continue
+
+                # Check if it's a heading
+                if para.startswith("##"):
+                    heading_text = para.lstrip("#").strip()
+                    doc.add_heading(heading_text, level=2)
+                elif para.startswith("#"):
+                    heading_text = para.lstrip("#").strip()
+                    doc.add_heading(heading_text, level=1)
+                elif para.startswith("**") and para.endswith("**"):
+                    heading_text = para.strip("*").strip()
+                    doc.add_heading(heading_text, level=2)
+                elif para.startswith("- ") or para.startswith("* "):
+                    # Handle bullet points
+                    lines = para.split("\n")
+                    for line in lines:
+                        line = line.strip()
+                        if line.startswith("- ") or line.startswith("* "):
+                            bullet_text = line[2:].strip()
+                            doc.add_paragraph(bullet_text, style="List Bullet")
+                        elif line:
+                            doc.add_paragraph(line)
+                else:
+                    doc.add_paragraph(para)
+
+            # Save to bytes
+            buffer = io.BytesIO()
+            doc.save(buffer)
+            buffer.seek(0)
+
+            return buffer.getvalue()
+        except Exception as e:
+            print(f"Error generating risk analysis: {e}")
+            return None
