@@ -28,6 +28,36 @@ class ExtractedRequirements(BaseModel):
     summary: str = Field(description="Brief summary of all requirements")
 
 
+# Output document extraction models
+class OutputDocumentField(BaseModel):
+    """Single field required for an output document."""
+    field_name: str = Field(description="Machine-readable identifier, e.g. 'company_description'")
+    field_label: str = Field(description="Human-readable label in Estonian")
+    field_label_en: str = Field(description="Human-readable label in English")
+    field_description: str = Field(description="Help text explaining what information is needed")
+    is_required: bool = Field(default=True, description="Whether this field is mandatory")
+
+
+class OutputDocument(BaseModel):
+    """Single output document that needs to be created for grant application."""
+    name: str = Field(description="Document name in Estonian, e.g. 'Ärikava'")
+    name_en: str = Field(description="Document name in English, e.g. 'Business Plan'")
+    description: str = Field(description="What this document should contain (Estonian)")
+    description_en: str = Field(description="What this document should contain (English)")
+    document_type: str = Field(default="docx", description="File type: docx, xlsx, pdf")
+    is_required: bool = Field(default=True, description="Whether this document is mandatory")
+    fields: List[OutputDocumentField] = Field(
+        default_factory=list,
+        description="List of fields/questions needed for this document"
+    )
+
+
+class ExtractedOutputDocuments(BaseModel):
+    """Output documents extracted from grant requirements."""
+    documents: List[OutputDocument] = Field(description="List of required output documents")
+    summary: str = Field(description="Brief summary of what documents are needed")
+
+
 class DocumentAnnotation(BaseModel):
     """Annotation for a specific part of a document."""
     text_segment: str = Field(description="The text being annotated (max 100 chars)")
@@ -117,6 +147,71 @@ class GeminiService:
             return ExtractedRequirements.model_validate_json(response.text)
         except Exception as e:
             print(f"Error extracting requirements: {e}")
+            return None
+
+    def extract_output_documents(self, document_text: str) -> Optional[ExtractedOutputDocuments]:
+        """
+        Extract required output documents from grant documentation.
+
+        Identifies what documents the applicant needs to submit
+        and what fields/questions each document should contain.
+
+        Args:
+            document_text: Text content of the grant requirements document
+
+        Returns:
+            ExtractedOutputDocuments object or None on error
+        """
+        prompt = f"""
+        {self._get_language_instruction()}
+
+        You are an expert at analyzing Estonian grant application requirements.
+        Your task is to identify what OUTPUT DOCUMENTS the applicant must create and submit.
+
+        IMPORTANT: Focus on documents that the applicant must CREATE, not pre-existing documents.
+        Examples of output documents:
+        - Ärikava (Business Plan)
+        - Eelarve (Budget)
+        - Projekti kirjeldus (Project Description)
+        - Tegevuskava (Action Plan)
+        - Riskianalüüs (Risk Analysis)
+        - Meeskonna tutvustus (Team Introduction)
+
+        For each document:
+        1. Name in Estonian and English
+        2. Description of what it should contain
+        3. Document type (docx, xlsx, pdf)
+        4. Whether it's mandatory
+        5. List of specific fields/questions that should be answered in this document
+
+        For the fields, be specific about what information is needed. Examples:
+        - company_name: "Ettevõtte nimi" / "Company name"
+        - project_goals: "Projekti eesmärgid" / "Project goals"
+        - total_budget: "Eelarve kogusumma" / "Total budget"
+        - team_members: "Meeskonnaliikmete nimekiri" / "List of team members"
+
+        GRANT DOCUMENTATION:
+        ---
+        {document_text[:15000]}
+        ---
+
+        Extract all required output documents with their fields.
+        """
+
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=ExtractedOutputDocuments,
+                    temperature=0.3
+                )
+            )
+
+            return ExtractedOutputDocuments.model_validate_json(response.text)
+        except Exception as e:
+            print(f"Error extracting output documents: {e}")
             return None
 
     def evaluate_document(
