@@ -57,13 +57,26 @@ def extract_infobits_from_document(
     Sa oled ekspert struktureeritud info eraldamisel dokumentidest.
     Analüüsi järgmist dokumenti ja eralda väärtused, mis vastavad määratud väljadele.
 
-    Iga välja kohta, mille kohta leiad infot:
+    KRIITILISED REEGLID:
+    1. ETTEVÕTTE KIRJELDUS (company_description) peab olema ETTEVÕTTE/ORGANISATSIOONI kohta, MITTE üksikisiku CV või kirjeldus
+    2. Ära sega isiklikke andmeid (CV, haridus, töökogemus) ettevõtte väljadega
+    3. CV-d on TUGIDOKUMENDID - neist EI TOHI eraldada ettevõtte infot
+    4. Äriplaanist eralda ettevõtte info, mitte asutaja isiklik kirjeldus
+    5. Mitte kõik dokumendid sisaldavad eraldatavat infot - SEE ON NORMAALNE
+
+    MIDA MITTE TEHA:
+    - Ära pane CV teksti ettevõtte kirjeldusse
+    - Ära pane isiklikku haridust ettevõtte andmetesse
+    - Ära sega "Full Stack Developer" tüüpi teksti ettevõtte kirjeldusse
+    - Ära sunni infot väljadesse kui see ei sobi - JÄTA VAHELE
+
+    Iga välja kohta, mille kohta leiad SOBIVAT infot:
     1. Eralda väärtus dokumendist (EESTI KEELES, tõlgi vajadusel)
     2. Anna usaldusväärsuse hinne (0.0-1.0)
     3. Lisa lähteteksti väljavõte (max 100 tähemärki)
 
-    Eralda ainult väärtusi, milles oled kindel. Ära arva ega mõtle välja.
-    Kui ei leia välja kohta infot, jäta see vahele.
+    Eralda ainult väärtusi, milles oled kindel JA mis on õige tüüpi info selle välja jaoks.
+    Kui ei leia välja kohta SOBIVAT infot, jäta see vahele.
 
     VÄLJAD, MIDA ERALDADA:
     ---
@@ -77,6 +90,7 @@ def extract_infobits_from_document(
 
     Eralda dokumentidest sobivad väärtused nii paljude väljade jaoks kui võimalik.
     KÕIK ERALDATUD VÄÄRTUSED PEAVAD OLEMA EESTI KEELES.
+    OLE ETTEVAATLIK: Kontrolli, et iga väärtus sobib välja tüübiga!
     """
 
     try:
