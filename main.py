@@ -83,6 +83,7 @@ def process_task(db, task: dict):
         # Import handlers lazily to avoid circular imports
         from handlers import (
             handle_infobit_extraction,
+            handle_infobit_generation,
             handle_evaluation,
             handle_generation,
             handle_requirement_extraction
@@ -90,6 +91,7 @@ def process_task(db, task: dict):
 
         handlers = {
             "infobit_extraction": handle_infobit_extraction,
+            "infobit_generation": handle_infobit_generation,
             "evaluation": handle_evaluation,
             "generation": handle_generation,
             "requirement_extraction": handle_requirement_extraction,
