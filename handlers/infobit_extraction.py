@@ -27,8 +27,8 @@ def handle_infobit_extraction(
     """
     from src.ai.infobit_extractor import extract_infobits_from_document
     from src.storage.supabase_storage import download_file
-    from src.database.infobits import get_empty_infobits, update_infobit
-    from src.database.projects import update_project, calculate_completion
+    from src.database.infobits import get_empty_infobits, update_infobit, calculate_completion
+    from src.database.projects import update_project
 
     files = task_data.get("files", [])
     language = task_data.get("language", "et")
